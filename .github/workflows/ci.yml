@@ -60,7 +60,7 @@ jobs:
           ado-pat: 'pat'
           ado-org: 'org'
           ado-project: 'project'
-          release-id: '1'
+          release-id: '153406354'
 
       - name: Print Output
         id: output
