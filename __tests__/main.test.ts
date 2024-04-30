@@ -225,7 +225,7 @@ describe('action', () => {
         case 'release-id':
           return 'this is not a number'
         default:
-          return ''
+          return 'foo'
       }
     })
 
@@ -235,5 +235,17 @@ describe('action', () => {
     // Verify that all of the core library functions were called correctly
     expect(setFailedMock).toHaveBeenNthCalledWith(1, 'No release id provided')
     expect(errorMock).not.toHaveBeenCalled()
+  })
+
+  it('sets a failed status when theres an exception', async () => {
+    // Set the action's inputs as return values from core.getInput()
+    getInputMock = mockInputs()
+    getOctokitMock.mockImplementation((token: string) => { throw Error('Could not get octokit') })
+
+    await main.run()
+    expect(runMock).toHaveReturned()
+
+    // Verify that all of the core library functions were called correctly
+    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Could not get octokit')
   })
 })
