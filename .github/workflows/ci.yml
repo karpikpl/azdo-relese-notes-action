@@ -57,7 +57,10 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 2000
+          ado-pat: 'pat'
+          ado-org: 'org'
+          ado-project: 'project'
+          release-id: '1'
 
       - name: Print Output
         id: output
