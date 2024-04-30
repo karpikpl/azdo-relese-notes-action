@@ -240,7 +240,9 @@ describe('action', () => {
   it('sets a failed status when theres an exception', async () => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock = mockInputs()
-    getOctokitMock.mockImplementation((token: string) => { throw Error('Could not get octokit') })
+    getOctokitMock.mockImplementation(() => {
+      throw Error('Could not get octokit')
+    })
 
     await main.run()
     expect(runMock).toHaveReturned()

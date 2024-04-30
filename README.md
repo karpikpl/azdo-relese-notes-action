@@ -6,18 +6,21 @@
 [![CodeQL](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-Enhanced AB#xxx links in GitHub release notes for Azure DevOps work items. Every `AB#x` reference in the release notes is replaced with a link.
+Enhanced AB#xxx links in GitHub release notes for Azure DevOps work items. Every
+`AB#x` reference in the release notes is replaced with a link.
 
 Before:
 
 ```md
-* AB#11 Feature/adding ci by @karpikpl in https://github.com/repoOwner/repoName/pull/1
+- AB#11 Feature/adding ci by @karpikpl in
+  https://github.com/repoOwner/repoName/pull/1
 ```
 
 After:
 
 ```md
-* [AB#11 [User Story] Best Feature so far (Completed)](https://dev.azure.com/adoOrg/adoProject/_workitems/edit/11) Feature/adding ci by @karpikpl in https://github.com/repoOwner/repoName/pull/1
+- [AB#11 [User Story] Best Feature so far (Completed)](https://dev.azure.com/adoOrg/adoProject/_workitems/edit/11)
+  Feature/adding ci by @karpikpl in https://github.com/repoOwner/repoName/pull/1
 ```
 
 ## Usage
@@ -41,10 +44,12 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
-        releaseId: 
-            description: 'The Id of the release to update - database Id (integer), not visible in the UI'
-            required: true
-            type: number
+      releaseId:
+        description:
+          'The Id of the release to update - database Id (integer), not visible
+          in the UI'
+        required: true
+        type: number
 
 permissions:
   contents: write
@@ -54,7 +59,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Install dependencies
         run: npm install node-fetch
 
@@ -70,7 +74,8 @@ jobs:
 
 ### `ado-pat`
 
-**Required** Azure DevOps personal access token with permissions to read work items.
+**Required** Azure DevOps personal access token with permissions to read work
+items.
 
 ### `ado-org`
 
