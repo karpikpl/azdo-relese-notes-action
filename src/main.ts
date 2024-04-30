@@ -1,21 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-
-type WorkItemsBatchResponse = {
-  count: number
-  value: WorkItem[]
-}
-type WorkItem = {
-  id: number
-  url: string
-  fields: {
-    'System.Id': number
-    'System.Title': string
-    'System.WorkItemType': string
-    'System.State': string
-    'Microsoft.VSTS.Scheduling.RemainingWork': string
-  }
-}
+import { WorkItemsBatchResponse } from './azdoTypes'
+import { getWorkItemsBatch } from './azdo'
 
 /**
  * The main function for the action.
@@ -44,13 +30,13 @@ export async function run(): Promise<void> {
       !repo_name
     ) {
       core.setFailed('Missing required inputs')
-      return
+      core.setOutput('workItems', '')
+    return
     }
-
-    core.info(`\u001b[35mUpdating release notes for release: ${releaseId}`)
 
     const octokit = github.getOctokit(token)
 
+    core.info(`\u001b[35mUpdating release notes for release: ${releaseId}`)
     const releaseResponse = await octokit.rest.repos.getRelease({
       owner: repo_owner,
       repo: repo_name,
@@ -59,7 +45,7 @@ export async function run(): Promise<void> {
 
     core.info(`\u001b[35mRelease response: ${releaseResponse.status}`)
     core.debug(`Release response: ${releaseResponse.data}`)
-    const body: string = releaseResponse.data.body!
+    const body: string = releaseResponse.data.body ?? ''
 
     // find all the work item ids, making sure the regex is greedy
     const workItemIds = (body.match(/(?<!\[)AB#\d+/g) || [])
@@ -70,38 +56,14 @@ export async function run(): Promise<void> {
 
     if (workItemIds.length === 0) {
       core.info(`\u001b[48;2;255;0;0mNo work items found in the release notes`)
+      core.setOutput('workItems', '')
       return
     }
 
-    // get work item details
-    const auth = Buffer.from(`:${adoPat}`).toString('base64')
+    const workItems: WorkItemsBatchResponse | undefined =
+      await getWorkItemsBatch(adoPat, adoOrg, adoProject, workItemIds)
 
-    // https://learn.microsoft.com/en-us/rest/api/azure/devops/wit/work-items/get-work-items-batch?view=azure-devops-rest-7.1&tabs=HTTP
-    const adoResponse = await fetch(
-      `https://dev.azure.com/${adoOrg}/${adoProject}/_apis/wit/workitemsbatch?api-version=7.1-preview.1`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${auth}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ids: workItemIds,
-          fields: [
-            'System.Id',
-            'System.Title',
-            'System.WorkItemType',
-            'System.State',
-            'Microsoft.VSTS.Scheduling.RemainingWork'
-          ]
-        })
-      }
-    )
-
-    core.info(`\u001b[35mWork item batch response: ${adoResponse.status}`)
-    const workItems: WorkItemsBatchResponse = await adoResponse.json()
-
-    if (adoResponse.status !== 200) {
+    if (!workItems) {
       core.setFailed('Failed to get work item details')
       return
     }
@@ -116,7 +78,8 @@ export async function run(): Promise<void> {
           `\u001b[35mWork item ${id}: ${workItem.fields['System.WorkItemType']} ${workItem.fields['System.Title']} (${workItem.fields['System.State']})`
         )
 
-        const regex = new RegExp(`(?<!\\[)AB#${id}\\b`, 'g')
+        // const regex = new RegExp(`(?<!\\[)AB#${id}\\b`, 'g')
+        const regex = new RegExp(`(?<!\\[)AB#${id}(?!\\d)`, 'g')
         newBody = newBody.replace(
           regex,
           `[AB#${id} [${workItem.fields['System.WorkItemType']}] ${workItem.fields['System.Title']} (${workItem.fields['System.State']})](https://dev.azure.com/${adoOrg}/${adoProject}/_workitems/edit/${id})`
