@@ -1,23 +1,47 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'AzDO release notes for GitHub'
+description:
+  'Enhanced AB#xxx links in GitHub release notes for Azure DevOps work items.'
+author: 'Piotr Karpala'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
-  color: 'red'
+  icon: 'clipboard'
+  color: 'purple'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  ado-pat:
+    description:
+      'Azure DevOps Personal Access Token with read access to work items.'
     required: true
-    default: '1000'
+  ado-org:
+    description: 'Azure DevOps organization name.'
+    required: true
+  ado-project:
+    description: 'Azure DevOps project name.'
+    required: true
+  repo-owner:
+    description: 'The repo owner.'
+    default: '${{ github.repository_owner }}'
+    required: true
+  repo-name:
+    description: 'The repo name.'
+    default: '${{ github.event.repository.name }}'
+    required: true
+  repo-token:
+    description:
+      'A GitHub token for API access. Defaults to {{ github.token }}.'
+    default: '${{ github.token }}'
+    required: true
+  release-id:
+    description: 'The release ID.'
+    required: true
+    default: '${{ github.event.release.id }}'
 
 # Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  workItems:
+    description: 'List of work items found in the release notes.'
 
 runs:
   using: node20

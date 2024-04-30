@@ -1,0 +1,75 @@
+{
+  "count": 6,
+  "value": [
+    {
+      "id": 1,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/1",
+      "fields": {
+        "System.Id": 1,
+        "System.Title": "Work item 1",
+        "System.WorkItemType": "Task",
+        "System.State": "To Do"
+      }
+    },
+    {
+      "id": 11,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/11",
+      "fields": {
+        "System.Id": 11,
+        "System.Title": "Best Feature so far",
+        "System.WorkItemType": "User Story",
+        "System.State": "Completed"
+      }
+    },
+    {
+      "id": 111,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/111",
+      "fields": {
+        "System.Id": 111,
+        "System.Title": "Work item 111",
+        "System.WorkItemType": "Bug",
+        "System.State": "Active"
+      }
+    },
+    {
+      "id": 5,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/5",
+      "fields": {
+        "System.Id": 5,
+        "System.Title": "Work item 5",
+        "System.WorkItemType": "User Story",
+        "System.State": "In Progress"
+      }
+    },
+    {
+      "id": 14,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/14",
+      "fields": {
+        "System.Id": 14,
+        "System.Title": "Work item 14",
+        "System.WorkItemType": "Task",
+        "System.State": "Done"
+      }
+    },
+    {
+      "id": 143,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/143",
+      "fields": {
+        "System.Id": 143,
+        "System.Title": "Work item 143",
+        "System.WorkItemType": "Bug",
+        "System.State": "Closed"
+      }
+    },
+    {
+      "id": 112,
+      "url": "https://dev.azure.com/adoOrg/adoProject/_workitems/edit/112",
+      "fields": {
+        "System.Id": 112,
+        "System.Title": "Work item for working",
+        "System.WorkItemType": "User Story",
+        "System.State": "New"
+      }
+    }
+  ]
+}
