@@ -31,7 +31,7 @@ export async function run(): Promise<void> {
     ) {
       core.setFailed('Missing required inputs')
       core.setOutput('workItems', '')
-    return
+      return
     }
 
     const octokit = github.getOctokit(token)

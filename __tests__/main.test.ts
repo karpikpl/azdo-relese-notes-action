@@ -9,21 +9,17 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as main from '../src/main'
-import { Octokit } from "@octokit/rest";
+import { Octokit } from '@octokit/rest'
 import { mockInputs } from './mock.helper'
 import * as azdo from '../src/azdo'
 import { WorkItemsBatchResponse } from '../src/azdoTypes'
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'
+import path from 'path'
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
 
-// Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
-
 // Mock the GitHub Actions core library
-let debugMock: jest.SpiedFunction<typeof core.debug>
 let errorMock: jest.SpiedFunction<typeof core.error>
 let getInputMock: jest.SpiedFunction<typeof core.getInput>
 let setFailedMock: jest.SpiedFunction<typeof core.setFailed>
@@ -39,22 +35,30 @@ describe('action', () => {
     jest.clearAllMocks()
     githubApi = new Octokit()
 
-    debugMock = jest.spyOn(core, 'debug').mockImplementation()
     errorMock = jest.spyOn(core, 'error').mockImplementation()
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
 
-    getReleaseMock = jest.spyOn(githubApi.rest.repos, 'getRelease').mockImplementation()
-    updateReleaseMock = jest.spyOn(githubApi.rest.repos, 'updateRelease').mockImplementation()
-    getOctokitMock = jest.spyOn(github, 'getOctokit').mockImplementation().mockReturnValue(githubApi)
-    
-    getWorkItemsBatchMock = jest.spyOn(azdo, 'getWorkItemsBatch').mockImplementation()
+    getReleaseMock = jest
+      .spyOn(githubApi.rest.repos, 'getRelease')
+      .mockImplementation()
+    updateReleaseMock = jest
+      .spyOn(githubApi.rest.repos, 'updateRelease')
+      .mockImplementation()
+    getOctokitMock = jest
+      .spyOn(github, 'getOctokit')
+      .mockImplementation()
+      .mockReturnValue(githubApi)
+
+    getWorkItemsBatchMock = jest
+      .spyOn(azdo, 'getWorkItemsBatch')
+      .mockImplementation()
   })
 
   it('Gets release notes - no AB#', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock = mockInputs();
+    getInputMock = mockInputs()
     getReleaseMock.mockResolvedValueOnce({
       status: 200,
       data: {
@@ -66,18 +70,15 @@ describe('action', () => {
     expect(runMock).toHaveReturned()
 
     // Verify that all of the core library functions were called correctly
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'workItems',
-      ''
-    )
+    expect(getOctokitMock).toHaveBeenCalledWith('token')
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'workItems', '')
     expect(errorMock).not.toHaveBeenCalled()
     expect(setFailedMock).not.toHaveBeenCalled()
   })
 
   it('Fails when workitems could not be found in ADO', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock = mockInputs();
+    getInputMock = mockInputs()
     getReleaseMock.mockResolvedValueOnce({
       status: 200,
       data: {
@@ -90,12 +91,14 @@ describe('action', () => {
     expect(runMock).toHaveReturned()
 
     // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenCalledWith('Failed to get work item details')
+    expect(setFailedMock).toHaveBeenCalledWith(
+      'Failed to get work item details'
+    )
   })
 
   it('Updates release notes with work items from ADO', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock = mockInputs();
+    getInputMock = mockInputs()
     getReleaseMock.mockResolvedValueOnce({
       status: 200,
       data: {
@@ -108,7 +111,7 @@ describe('action', () => {
         body: 'new body'
       }
     })
-    const workItemsBatchResponse : WorkItemsBatchResponse = {
+    const workItemsBatchResponse: WorkItemsBatchResponse = {
       count: 1,
       value: [
         {
@@ -118,7 +121,7 @@ describe('action', () => {
             'System.Id': 1234,
             'System.Title': 'Work item title',
             'System.WorkItemType': 'Task',
-            'System.State': 'Done',
+            'System.State': 'Done'
           }
         }
       ]
@@ -130,19 +133,24 @@ describe('action', () => {
 
     // Verify that all of the core library functions were called correctly
     expect(setFailedMock).not.toHaveBeenCalled()
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'workItems',
-      '1234'
-    )
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'workItems', '1234')
   })
 
   it('Updates release notes for many workitem references', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock = mockInputs();
-    const notesBefore = fs.readFileSync(path.join(__dirname, 'test_cases/big', 'notes_before.md'), 'utf8')
-    const notesAfter = fs.readFileSync(path.join(__dirname, 'test_cases/big', 'notes_after.md'), 'utf8')
-    const adoResponse = fs.readFileSync(path.join(__dirname, 'test_cases/big', 'ado_response.json'), 'utf8')
+    getInputMock = mockInputs()
+    const notesBefore = fs.readFileSync(
+      path.join(__dirname, 'test_cases/big', 'notes_before.md'),
+      'utf8'
+    )
+    const notesAfter = fs.readFileSync(
+      path.join(__dirname, 'test_cases/big', 'notes_after.md'),
+      'utf8'
+    )
+    const adoResponse = fs.readFileSync(
+      path.join(__dirname, 'test_cases/big', 'ado_response.json'),
+      'utf8'
+    )
     getReleaseMock.mockResolvedValueOnce({
       status: 200,
       data: {
@@ -155,7 +163,8 @@ describe('action', () => {
         body: 'new body'
       }
     })
-    const workItemsBatchResponse : WorkItemsBatchResponse = JSON.parse(adoResponse)
+    const workItemsBatchResponse: WorkItemsBatchResponse =
+      JSON.parse(adoResponse)
     getWorkItemsBatchMock.mockResolvedValueOnce(workItemsBatchResponse)
 
     await main.run()
@@ -182,18 +191,32 @@ describe('action', () => {
     ['adoPat', 'adoProject', '', 'token', 'repo_owner', 'repo_name'],
     ['adoPat', 'adoProject', 'adoOrg', '', 'repo_owner', 'repo_name'],
     ['adoPat', 'adoProject', 'adoOrg', 'token', '', 'repo_name'],
-    ['adoPat', 'adoProject', 'adoOrg', 'token', 'repo_owner', ''],
-  ])('missing inputs: adoPat:"%s" adoProject:"%s" adoOrg:"%s" token:"%s" repoOwner:"%s" repoName:"%s"', async (adoPat, adoProject, adoOrg, token, repo_owner, repo_name) => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock = mockInputs(123, adoPat, adoProject, adoOrg, token, repo_owner, repo_name)
+    ['adoPat', 'adoProject', 'adoOrg', 'token', 'repo_owner', '']
+  ])(
+    'missing inputs: adoPat:"%s" adoProject:"%s" adoOrg:"%s" token:"%s" repoOwner:"%s" repoName:"%s"',
+    async (adoPat, adoProject, adoOrg, token, repo_owner, repo_name) => {
+      // Set the action's inputs as return values from core.getInput()
+      getInputMock = mockInputs(
+        123,
+        adoPat,
+        adoProject,
+        adoOrg,
+        token,
+        repo_owner,
+        repo_name
+      )
 
-    await main.run()
-    expect(runMock).toHaveReturned()
+      await main.run()
+      expect(runMock).toHaveReturned()
 
-    // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Missing required inputs')
-    expect(errorMock).not.toHaveBeenCalled()
-  })
+      // Verify that all of the core library functions were called correctly
+      expect(setFailedMock).toHaveBeenNthCalledWith(
+        1,
+        'Missing required inputs'
+      )
+      expect(errorMock).not.toHaveBeenCalled()
+    }
+  )
 
   it('sets a failed status', async () => {
     // Set the action's inputs as return values from core.getInput()
@@ -210,10 +233,7 @@ describe('action', () => {
     expect(runMock).toHaveReturned()
 
     // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(
-      1,
-      'No release id provided'
-    )
+    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'No release id provided')
     expect(errorMock).not.toHaveBeenCalled()
   })
 })
