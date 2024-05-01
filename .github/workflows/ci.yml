@@ -44,6 +44,49 @@ jobs:
         id: npm-ci-test
         run: npm run ci-test
 
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: Test Results JS
+          files: |
+            .reports/**/*.xml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: js-results
+          path: |
+            reports/*
+            coverage/*
+
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: ./coverage/*.xml
+          badge: true
+          format: markdown
+          output: both
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
+      - name: Add Coverage Summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            // read summary file
+            var summary = fs.readFileSync('code-coverage-results.md', 'utf8');
+
+            await core.summary
+            .addHeading('JS Code Coverage Summary')
+            .addRaw(summary)
+            .write()
+
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
