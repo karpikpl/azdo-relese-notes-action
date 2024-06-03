@@ -63,7 +63,7 @@ jobs:
         run: npm install node-fetch
 
       - name: Update release notes
-        uses: karpikpl/azdo-relese-notes-action@v1.0.0
+        uses: karpikpl/azdo-relese-notes-action@v1.0.1
         with:
           ado-pat: ${{ secrets.ADO_PAT }}
           ado-org: my-org

@@ -49,7 +49,8 @@ describe('action', () => {
     getOctokitMock = jest
       .spyOn(github, 'getOctokit')
       .mockImplementation()
-      .mockReturnValue(githubApi)
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
+      .mockReturnValue(githubApi as any)
 
     getWorkItemsBatchMock = jest
       .spyOn(azdo, 'getWorkItemsBatch')
