@@ -32,11 +32,14 @@
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
     "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
-    "test": "npx jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
   },
   "license": "MIT",
   "jest": {
+    "testEnvironmentOptions": {
+      "NODE_OPTIONS": "--experimental-vm-modules"
+    },
     "preset": "ts-jest",
     "verbose": true,
     "clearMocks": true,
