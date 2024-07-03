@@ -5,16 +5,18 @@
  * Specifically, the inputs listed in `action.yml` should be set as environment
  * variables following the pattern `INPUT_<INPUT_NAME>`.
  */
-
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import * as main from '../src/main'
-import { Octokit } from '@octokit/rest'
 import { mockInputs } from './mock.helper'
 import * as azdo from '../src/azdo'
 import { WorkItemsBatchResponse } from '../src/azdoTypes'
 import fs from 'fs'
 import path from 'path'
+import * as github from '@actions/github'
+
+jest.mock('@actions/github', () => ({
+  getOctokit: jest.fn()
+}))
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -24,7 +26,6 @@ let errorMock: jest.SpiedFunction<typeof core.error>
 let getInputMock: jest.SpiedFunction<typeof core.getInput>
 let setFailedMock: jest.SpiedFunction<typeof core.setFailed>
 let setOutputMock: jest.SpiedFunction<typeof core.setOutput>
-let githubApi: Octokit
 let getReleaseMock: jest.SpyInstance
 let updateReleaseMock: jest.SpyInstance
 let getOctokitMock: jest.SpyInstance
@@ -33,24 +34,29 @@ let getWorkItemsBatchMock: jest.SpiedFunction<typeof azdo.getWorkItemsBatch>
 describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    githubApi = new Octokit()
+    // githubApi = new GitHub()
 
     errorMock = jest.spyOn(core, 'error').mockImplementation()
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
+    getReleaseMock = jest.fn()
+    updateReleaseMock = jest.fn()
 
-    getReleaseMock = jest
-      .spyOn(githubApi.rest.repos, 'getRelease')
-      .mockImplementation()
-    updateReleaseMock = jest
-      .spyOn(githubApi.rest.repos, 'updateRelease')
-      .mockImplementation()
-    getOctokitMock = jest
-      .spyOn(github, 'getOctokit')
-      .mockImplementation()
-      /* eslint-disable  @typescript-eslint/no-explicit-any */
-      .mockReturnValue(githubApi as any)
+    const mockOctokitInstance = {
+      rest: {
+        repos: {
+          getRelease: getReleaseMock,
+          updateRelease: updateReleaseMock
+        }
+      }
+      // Add other mocked methods as needed
+    }
+
+    getOctokitMock = github.getOctokit as jest.MockedFunction<
+      typeof github.getOctokit
+    >
+    getOctokitMock.mockReturnValue(mockOctokitInstance)
 
     getWorkItemsBatchMock = jest
       .spyOn(azdo, 'getWorkItemsBatch')
