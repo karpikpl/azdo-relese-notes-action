@@ -1,9 +1,9 @@
 # Azure DevOps GitHub release notes integration
 
-[![GitHub Super-Linter](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/ci.yml/badge.svg)
-[![Check dist/](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/check-dist.yml)
-[![CodeQL](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/karpikpl/azdo-relese-notes-action/actions/workflows/codeql-analysis.yml)
+[![GitHub Super-Linter](https://github.com/karpikpl/azdo-release-notes-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/karpikpl/azdo-release-notes-action/actions/workflows/ci.yml/badge.svg)
+[![Check dist/](https://github.com/karpikpl/azdo-release-notes-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/karpikpl/azdo-release-notes-action/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/karpikpl/azdo-release-notes-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/karpikpl/azdo-release-notes-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
 Enhanced AB#xxx links in GitHub release notes for Azure DevOps work items. Every
@@ -63,7 +63,7 @@ jobs:
         run: npm install node-fetch
 
       - name: Update release notes
-        uses: karpikpl/azdo-relese-notes-action@v1.0.1
+        uses: karpikpl/azdo-release-notes-action@v1.0.1
         with:
           ado-pat: ${{ secrets.ADO_PAT }}
           ado-org: my-org
